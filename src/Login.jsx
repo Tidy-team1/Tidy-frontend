@@ -2,10 +2,12 @@ import React from 'react';
 import './Login.css';
 
 function Login({ onClose }) {
-  //login 컴포넌트에서는 onclose판단 (닫기 버튼에서)
   const naverLogin = () => {
-    window.location.href =
-      'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=YOUR_NAVER_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&state=RANDOM_STATE';
+    window.location.href = 'http://localhost:8080/auth/login/naver';
+  };
+
+  const googleLogin = () => {
+    window.location.href = 'http://localhost:8080/auth/login/google';
   };
 
   return (
@@ -20,12 +22,11 @@ function Login({ onClose }) {
             X
           </button>
         </h2>
-        {/*<input type="text" placeholder="아이디" />
-        <input type="password" placeholder="비밀번호" />*/}
+
         <button onClick={naverLogin}>
           <b>네이버</b>로 로그인
         </button>
-        <button>
+        <button onClick={googleLogin}>
           <b>Google</b>로 로그인
         </button>
         <button>
