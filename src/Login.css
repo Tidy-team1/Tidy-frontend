@@ -1,0 +1,54 @@
+/* 화면 전체 어두운 배경 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* 가운데 로그인창 */
+.modal-content {
+  background-color: #f3dce6;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.modal-content input {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.modal-content button {
+  padding: 10px;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  cursor: pointer;
+  border: none;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+.modal-content .close {
+  position: absolute;
+  top: 10px;
+  right: 0%;
+  background: none;
+  box-shadow: none;
+  border: none;
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
