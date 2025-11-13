@@ -1,0 +1,16 @@
+img {
+  width: 8%;
+  height: 15%;
+  position: absolute;
+  top: 15%;
+}
+.catchpri {
+  position: absolute;
+  top: 30%;
+  color: #ae778f;
+  font-size: 14pt;
+}
+p {
+  position: absolute;
+  top: 40%;
+}

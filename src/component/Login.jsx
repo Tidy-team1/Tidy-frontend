@@ -1,7 +1,7 @@
 import React from 'react';
 import './Login.css';
 
-function Login({ onClose }) {
+function Login({ onClose, onLoginSuccess }) {
   const naverLogin = () => {
     window.location.href = 'http://localhost:8080/auth/login/naver';
   };

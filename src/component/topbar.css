@@ -21,17 +21,31 @@ nav {
 .nav-item:hover {
   background-color: #844861;
 }
+.userName {
+  background-color: transparent;
+  cursor: default;
+  display: inline-block;
+}
+.nav-item:hover .userName {
+  background-color: transparent !important;
+}
 .nav-item:hover .submenu {
   display: flex;
 }
 .nav-item a {
-  text-align: centor;
   text-decoration: none;
   color: white;
 }
 .profile {
   margin-left: auto; /* 오른쪽 끝으로 밀기 */
   color: white;
+}
+.profile a {
+  display: inline-block;
+  padding: 15px;
+}
+.profile a:hover {
+  background-color: #844861;
 }
 .submenu {
   display: none;

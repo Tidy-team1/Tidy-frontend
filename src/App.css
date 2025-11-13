@@ -10,63 +10,12 @@ body,
   background: #f5f1f3;
   display: flex;
   justify-content: center;
+}
+.container {
+  height: 100vh;
+  background: #f5f1f3;
+  display: flex;
+  justify-content: center;
   align-items: center;
-}
-img {
-  width: 8%;
-  height: 15%;
-  position: absolute;
-  top: 15%;
-}
-.catchpri {
-  position: absolute;
-  top: 30%;
-  color: #ae778f;
-  font-size: 14pt;
-}
-p {
-  position: absolute;
-  top: 40%;
-}
-.loadContainer button {
-  background: rgba(200, 144, 167, 0.7);
-  border-radius: 10px;
-  width: 300px;
-  height: 70px;
-  box-shadow: 0px 3px 3px 3px rgba(0, 0, 0, 0.25);
-  border: none;
-  font-size: 12pt;
-}
-.fileSelect {
-  position: absolute;
-  top: 45%;
-}
-.loadContainer {
-  display: flex;
-  flex-direction: row;
-  position: absolute;
-  top: 50%;
-  gap: 100px;
-}
-.dragLoad {
-  background: #d9d9d9;
-  width: 600px;
-  height: 350px;
-  text-align: center;
-  padding: 20px;
-  box-sizing: border-box;
-  color: #474747;
-  display: flex; /* flex로 내부 정렬 */
-  flex-direction: column; /* 텍스트 위, 이미지 아래 */
-  align-items: center; /* 가로 가운데 정렬 */
-}
-.buttonContainer {
-  display: flex;
   flex-direction: column;
-  gap: 50px;
-}
-.dragLoad img {
-  width: 25px;
-  height: 35px;
-  filter: brightness(1.5);
 }
