@@ -1,4 +1,4 @@
-img {
+.logoImg {
   width: 8%;
   height: 15%;
   position: absolute;
@@ -9,8 +9,4 @@ img {
   top: 30%;
   color: #ae778f;
   font-size: 14pt;
-}
-p {
-  position: absolute;
-  top: 40%;
 }

@@ -4,7 +4,9 @@ import Topbar from './component/Topbar.jsx';
 import Login from './component/Login.jsx';
 import Logo from './component/Logo.jsx';
 import Upload from './component/Upload.jsx';
+import SelectReview from './component/SelectReview.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ReviewPage from './component/ReviewPage.jsx';
 
 function App() {
   let post = '불러온 API 저장';
@@ -26,6 +28,16 @@ function App() {
               </>
             }
           />
+          <Route
+            path="/select"
+            element={
+              <>
+                <Logo />
+                <SelectReview />
+              </>
+            }
+          />
+          <Route path="/review" element={<ReviewPage />} />
         </Routes>
       </div>
     </BrowserRouter>

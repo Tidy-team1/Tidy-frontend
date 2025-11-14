@@ -1,0 +1,21 @@
+.slidebar {
+  width: 200px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  background: #c1b0b0;
+  height: 100vh;
+}
+.eachSlide {
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+.eachSlide:hover {
+  border-color: #7aaaff;
+}
+.eachSlide img {
+  width: 100%;
+}
