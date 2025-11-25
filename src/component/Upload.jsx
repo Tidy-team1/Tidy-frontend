@@ -10,6 +10,7 @@ function Upload() {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); //로딩진행 상태
 
   const onFileSelect = () => {
     fileInputRef.current.click();
@@ -62,34 +63,44 @@ function Upload() {
     setFile(null);
     fileInputRef.current.value = '';
   };
-  /*const handleUpload = async (type) => {
+
+  const handleUpload = async () => {
     if (!file) {
       alert('파일을 먼저 선택하세요.');
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('workspaceType', type);
+    setLoading(true);
 
     try {
-      const response = await axios.post(
-        `/workspaceType/${type}/presentations`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-      console.log('업로드 성공:', response.data);
+      // 2. 사용자 정보 조회
+      const meRes = await axios.get('/auth/me', { withCredentials: true });
+      const personalSpaceId = meRes.data.personalSpaceId;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      await axios.post(`/spaces/${personalSpaceId}/presentations`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('업로드 완료');
+      navigate('/select');
     } catch (error) {
-      console.error('업로드 에러:', error);
+      console.error('백그라운드 업로드 실패:', error);
+    } finally {
+      setLoading(false);
     }
-  };*/
+  };
 
   return (
     <div className="container">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loader"></div>
+          <p>파일 업로드 중입니다...</p>
+        </div>
+      )}
       <p className="uploadP">검토하려는 파일을 업로드 하세요.</p>
       <button className="fileSelect" onClick={onFileSelect}>
         + 파일 선택하기
@@ -109,17 +120,12 @@ function Upload() {
           {renderFilePreview()}
         </div>
         <div className="buttonContainer">
+          <button onClick={handleUpload}>개인 워크스페이스에서 검토</button>
           <button
-            /*onClick={() => handleUpload('personal')}*/ onClick={() =>
-              navigate('/select')
-            }
-          >
-            개인 워크스페이스에서 검토
-          </button>
-          <button
-            /*onClick={() => handleUpload('team')}*/ onClick={() =>
-              navigate('/select')
-            }
+            onClick={() => {
+              navigate('/createTeam');
+              handleUpload('team'); ///이거 지우고 createTeam에서 생성누르면 handleUpload하기( 다시 정의)
+            }}
           >
             팀 워크스페이스에서 검토
           </button>

@@ -7,6 +7,7 @@ import Upload from './component/Upload.jsx';
 import SelectReview from './component/SelectReview.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReviewPage from './component/ReviewPage.jsx';
+import CreateTeam from './component/CreateTeam.jsx';
 
 function App() {
   let post = '불러온 API 저장';
@@ -25,6 +26,15 @@ function App() {
               <>
                 <Logo />
                 <Upload />
+              </>
+            }
+          />
+          <Route
+            path="/createTeam"
+            element={
+              <>
+                <Logo />
+                <CreateTeam />
               </>
             }
           />
