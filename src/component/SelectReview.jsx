@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import './SelectReview.css';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.withCredentials = true;
 
 // 검토 항목의 계층적 데이터 구조 정의
 const reviewItems = [
@@ -45,8 +49,17 @@ const parentChildMap = reviewItems.reduce((acc, parent) => {
   return acc;
 }, {});
 
-function SelectReview(props) {
-  // 🐛 수정: allkeys -> allKeys (대문자 K)
+//post 보내기위한 child 추출 배열
+const leafOptionsKeys = reviewItems
+  .flatMap((item) =>
+    item.children ? item.children.map((child) => child.id) : [item.id]
+  )
+  .filter((id) => id !== 'all' && id !== 'text' && id !== 'aiFeedback');
+
+function SelectReview() {
+  const location = useLocation();
+  const presentationId = location.state?.presentationId;
+
   const [checkedItems, setCheckedItems] = useState(() =>
     allKeys.reduce((acc, key) => ({ ...acc, [key]: false }), {})
   );
@@ -142,10 +155,26 @@ function SelectReview(props) {
       )}
     </React.Fragment>
   );
-  const navigate = useNavigate();
-  const goToReview = () => {
-    navigate('/review');
+
+  const sendReviewRequest = async () => {
+    const selectedOptions = leafOptionsKeys.filter((key) => checkedItems[key]);
+    const body = {
+      options: selectedOptions,
+    };
+    try {
+      const { data } = await axios.post(
+        `/presentations/${presentationId}/review`,
+        body
+      );
+
+      console.log('검토요청 응답:', data);
+      navigate('/review', { state: { presentationId } });
+    } catch (err) {
+      console.error('검토요청 실패:', err);
+    }
   };
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -171,7 +200,7 @@ function SelectReview(props) {
           </div>
         </div>
       </div>
-      <button className="reviewBtn" onClick={goToReview}>
+      <button className="reviewBtn" onClick={sendReviewRequest}>
         검토하기
       </button>
     </>

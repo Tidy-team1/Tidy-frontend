@@ -1,0 +1,134 @@
+.CreateTeamPage {
+  padding: 40px;
+  top: 40%;
+  position: absolute;
+  width: 700px;
+  height: 400px;
+  background-color: #ffffff;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+.titleContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.titleContainer span {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #333;
+}
+.titleContainer button {
+  padding: 8px 15px;
+  background-color: #ae778f;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 400;
+  color: white;
+  transition: background-color 0.2s;
+  box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.25);
+}
+.titleContainer button:hover {
+  background-color: #975772;
+}
+.teamCreateContainer {
+  display: flex;
+  gap: 80px;
+}
+.addedMember {
+  /* Flex item 설정: 늘어나지 않고(0), 줄어들지 않으며(0), 기본 너비(basis) 30% */
+  flex: 0 0 30%;
+  padding-right: 20px;
+}
+.addedMember p:first-child {
+  /* "추가된 멤버" 타이틀 */
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 20px;
+  margin-top: 0px;
+  margin-left: 10px;
+}
+.addedMember p:not(:first-child) {
+  /* 멤버 아이템 스타일 */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  color: #333;
+  /* 👤 아이콘 크기 조정 (선택적) */
+  font-size: 1.1em;
+}
+.inviteContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+.inviteContainer p {
+  font-size: 1em;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: -5px;
+}
+.inviteContainer > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.inviteContainer input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.inviteContainer span {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  color: #aaa;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background-color: #fcfcfc;
+  font-size: 100%;
+}
+.inviteContainer button {
+  padding: 10px 15px;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  width: 70px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.inviteContainer button:hover {
+  background-color: #bdbdbd;
+}
+.createBtn {
+  margin-left: 90%;
+  margin-top: 7%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  background-color: #ae778f;
+  color: white;
+  cursor: pointer;
+  letter-spacing: 1.8px;
+  font-weight: 450;
+  box-shadow: 0px 2px 2px 2px rgba(0, 0, 0, 0.25);
+  font-size: 12pt;
+}
+.createBtn:hover {
+  background-color: #975772;
+}

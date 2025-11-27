@@ -3,19 +3,29 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 5px;
   overflow-y: auto;
   background: #c1b0b0;
   height: 100vh;
 }
 .eachSlide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border: none;
   cursor: pointer;
   background: none;
 }
 .eachSlide:hover {
-  border-color: #7aaaff;
+  background: rgb(158, 139, 139);
 }
 .eachSlide img {
   width: 100%;
+  display: block;
+  margin-top: 10px;
+}
+.eachSlide p {
+  margin-top: 5px;
+  text-align: center;
+  font-size: 12px;
 }

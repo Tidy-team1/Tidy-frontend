@@ -2,29 +2,49 @@ import React from 'react';
 import './Slidebar.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+axios.defaults.baseURL = 'http://localhost:8080';
 
-function Slidebar(presentationId) {
+function Slidebar({ presentationId, onSlideSelect }) {
   const [slides, setSlides] = useState([]);
 
   useEffect(() => {
+    if (!presentationId) return;
+    console.log('pptId:', presentationId);
     axios
       .get(`/presentations/${presentationId}/slides`)
-      .then((res) => setSlides(res.data.slides))
+      .then(async (res) => {
+        const slideList = res.data.slides;
+
+        //각 slide.thumbnailUrl 을 presigned URL로 변환
+        const slidesWithRealUrl = await Promise.all(
+          slideList.map(async (slide) => {
+            const key = `${slide.thumbnailUrl}`;
+            const { data } = await axios.get(`/files/presigned?key=${key}`);
+            console.log('key:', key);
+            return {
+              ...slide,
+              realThumbnail: data.url,
+            };
+          })
+        );
+
+        setSlides(slidesWithRealUrl);
+      })
       .catch((err) => {
         console.error(err);
         setSlides([
           {
-            index: 1,
+            slideIndex: 1,
             thumbnailUrl:
               'https://cdn.tidy.ai/presentations/201/thumbnails/slide1.png',
           },
           {
-            index: 2,
+            slideIndex: 2,
             thumbnailUrl:
               'https://cdn.tidy.ai/presentations/201/thumbnails/slide2.png',
           },
           {
-            index: 3,
+            slideIndex: 3,
             thumbnailUrl:
               'https://cdn.tidy.ai/presentations/201/thumbnails/slide3.png',
           },
@@ -35,14 +55,17 @@ function Slidebar(presentationId) {
   return (
     <div className="slidebar">
       {slides.map((slide) => (
-        <div key={slide.index} className="eachSlide">
+        <div
+          key={slide.id}
+          className="eachSlide"
+          onClick={() => onSlideSelect(slide.slideIndex)}
+        >
           <img
-            key={slide.index}
-            src={slide.thumbnailUrl}
-            alt={`Slide${slide.index}`}
-            /*</div>*onClick={() => onSlideSelect(slide.index)*/
+            key={slide.slideIndex}
+            src={slide.realThumbnail}
+            alt={`Slide${slide.slideIndex}`}
           ></img>
-          <span>{slide.index}</span>
+          <p>{slide.slideIndex + 1}</p>
         </div>
       ))}
     </div>
