@@ -12,45 +12,67 @@
   align-items: center;
 }
 .saveButton {
-  position: relative;
+  align-self: flex-start;
+  margin-top: 20px;
   background: none;
   border: none;
   color: #555;
   font-size: 14px;
   cursor: pointer;
   font-weight: bold;
-  padding: 0 10px 0 0;
-  margin-top: 10px;
-  margin-right: 1300px;
+  margin-bottom: 15px;
+}
+.feedback-slideId {
+  display: flex;
+  gap: 10px;
+}
+.slide-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: #eee;
+  cursor: pointer;
+  font-size: 14px;
+}
+.slide-button.activie {
+  background: #7a8cff;
+  color: white;
+  font-weight: bold;
 }
 .feedbackContainer {
   display: flex;
   align-items: center;
-  gap: 100px;
-  margin-top: 20px;
+  gap: 50px;
+  margin-top: 15px;
   background-color: #d9d9d9;
-  padding: 20px;
+  padding: 20px 30px;
+  border-radius: 8px;
+  width: fit-content;
 }
 .feedback-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-right: 20px;
+  min-width: 650px;
 }
-.style-button {
-  background-color: #e09076;
-  color: white;
+.feedback-type {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: bold;
+}
+.each-type {
+  font-size: 16px;
+  background: white;
   padding: 4px 8px;
-  margin-bottom: 4px;
   border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
 }
 .feedback-checks {
   display: flex;
   flex-direction: column;
-  font-size: 18px;
+  font-size: 16px;
   color: #333;
+  gap: 8px;
   line-height: 2;
 }
 .feedback-checks input[type='checkbox'] {
@@ -62,8 +84,18 @@
   cursor: pointer;
   margin-right: 10px;
 }
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
 .check-item label {
   margin-left: 5px;
+}
+.details {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
 }
 .modify-button {
   background-color: #ae778f;
@@ -80,10 +112,13 @@
 }
 .slidePage {
   background-color: #e0e0e0; /* 이미지의 중앙 회색 영역 */
-  margin-top: 40px;
+  margin-top: 35px;
   margin-bottom: 20px;
   width: 888px;
   height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .slidePage img {
   max-width: 100%;
@@ -94,6 +129,7 @@
   display: flex;
   justify-content: space-between;
 }
+
 .score-section {
   display: flex;
   gap: 30px;
@@ -138,4 +174,62 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
+}
+.reviewOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+.reviewLoader {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 6px solid transparent;
+  position: relative;
+  animation: spin 1.2s linear infinite, colorShift 3s ease-in-out infinite;
+  border-top-color: #7a8cff; /* 초기 색*/
+  border-right-color: #7a8cff;
+  box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes colorShift {
+  0% {
+    border-top-color: #7a8cff;
+    border-right-color: #7a8cff;
+    box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+  }
+  25% {
+    border-top-color: #ae78df;
+    border-right-color: #ae78df;
+    box-shadow: 0 0 30px rgba(174, 120, 223, 0.4);
+  }
+  50% {
+    border-top-color: #d485a8;
+    border-right-color: #d485a8;
+    box-shadow: 0 0 30px rgba(212, 133, 168, 0.4);
+  }
+  75% {
+    border-top-color: #e09076;
+    border-right-color: #e09076;
+    box-shadow: 0 0 30px rgba(224, 144, 118, 0.4);
+  }
+  100% {
+    border-top-color: #7a8cff;
+    border-right-color: #7a8cff;
+    box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+  }
 }

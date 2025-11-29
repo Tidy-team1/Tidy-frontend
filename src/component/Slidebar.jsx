@@ -20,7 +20,6 @@ function Slidebar({ presentationId, onSlideSelect }) {
           slideList.map(async (slide) => {
             const key = `${slide.thumbnailUrl}`;
             const { data } = await axios.get(`/files/presigned?key=${key}`);
-            console.log('key:', key);
             return {
               ...slide,
               realThumbnail: data.url,
@@ -58,7 +57,10 @@ function Slidebar({ presentationId, onSlideSelect }) {
         <div
           key={slide.id}
           className="eachSlide"
-          onClick={() => onSlideSelect(slide.slideIndex)}
+          onClick={() => {
+            onSlideSelect(slide.slideIndex);
+            console.log('slide.slideIndex: ', slide.slideIndex);
+          }}
         >
           <img
             key={slide.slideIndex}

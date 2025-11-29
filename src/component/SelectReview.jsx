@@ -59,6 +59,7 @@ const leafOptionsKeys = reviewItems
 function SelectReview() {
   const location = useLocation();
   const presentationId = location.state?.presentationId;
+  const isTeam = location.state?.isTeam || false;
 
   const [checkedItems, setCheckedItems] = useState(() =>
     allKeys.reduce((acc, key) => ({ ...acc, [key]: false }), {})
@@ -166,9 +167,9 @@ function SelectReview() {
         `/presentations/${presentationId}/review`,
         body
       );
-
-      console.log('검토요청 응답:', data);
-      navigate('/review', { state: { presentationId } });
+      const taskId = data.taskId;
+      console.log('검토요청 응답 taskId:', taskId);
+      navigate('/review', { state: { presentationId, isTeam, taskId } });
     } catch (err) {
       console.error('검토요청 실패:', err);
     }

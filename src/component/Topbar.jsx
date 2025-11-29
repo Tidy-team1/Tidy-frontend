@@ -81,7 +81,7 @@ function Topbar({ onLoginClick }) {
             <>
               <div className="userName">
                 <span className="userName" style={{ marginRight: '10px' }}>
-                  {userName}님
+                  👤{userName}님
                 </span>
               </div>
               <a onClick={logout} style={{ cursor: 'pointer' }}>

@@ -43,27 +43,38 @@
 .addedMember {
   /* Flex item 설정: 늘어나지 않고(0), 줄어들지 않으며(0), 기본 너비(basis) 30% */
   flex: 0 0 30%;
+  flex-direction: column;
+  gap: 12px;
   padding-right: 20px;
 }
-.addedMember p:first-child {
-  /* "추가된 멤버" 타이틀 */
+.addedMember p:first-of-type {
+  /*팀이름 텍스트*/
   font-size: 1.1em;
   font-weight: bold;
   color: #555;
-  margin-bottom: 20px;
-  margin-top: 0px;
-  margin-left: 10px;
+  margin: 0 0 5px 5px;
 }
-.addedMember p:not(:first-child) {
-  /* 멤버 아이템 스타일 */
+.addedMember input[type='text'] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.addedMember p:nth-of-type(2) {
+  /*요청된 멤버*/
+  font-size: 1.05em;
+  font-weight: bold;
+  color: #555;
+  margin: 30px 0 5px 5px;
+}
+.addedMember p.memberItem {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
   margin-left: 10px;
   color: #333;
-  /* 👤 아이콘 크기 조정 (선택적) */
-  font-size: 1.1em;
+  font-size: 1rem;
 }
 .inviteContainer {
   flex: 1;
@@ -131,4 +142,62 @@
 }
 .createBtn:hover {
   background-color: #975772;
+}
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+.loader {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 6px solid transparent;
+  position: relative;
+  animation: spin 1.2s linear infinite, colorShift 3s ease-in-out infinite;
+  border-top-color: #7a8cff; /* 초기 색 */
+  border-right-color: #7a8cff;
+  box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes colorShift {
+  0% {
+    border-top-color: #7a8cff;
+    border-right-color: #7a8cff;
+    box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+  }
+  25% {
+    border-top-color: #ae78df;
+    border-right-color: #ae78df;
+    box-shadow: 0 0 30px rgba(174, 120, 223, 0.4);
+  }
+  50% {
+    border-top-color: #d485a8;
+    border-right-color: #d485a8;
+    box-shadow: 0 0 30px rgba(212, 133, 168, 0.4);
+  }
+  75% {
+    border-top-color: #e09076;
+    border-right-color: #e09076;
+    box-shadow: 0 0 30px rgba(224, 144, 118, 0.4);
+  }
+  100% {
+    border-top-color: #7a8cff;
+    border-right-color: #7a8cff;
+    box-shadow: 0 0 30px rgba(150, 160, 255, 0.4);
+  }
 }
