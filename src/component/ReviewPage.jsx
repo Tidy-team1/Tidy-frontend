@@ -76,7 +76,7 @@ function ReviewPage() {
     axios
       .get(`/presentations/${presentationId}/feedbacks`)
       .then((res) => {
-        console.log(res.data);
+        console.log('피드백 슬라이드:', res.data);
         const ids = Array.from(new Set(res.data.map((f) => f.slideId)));
         setSlideIds(ids);
       })
@@ -137,24 +137,22 @@ function ReviewPage() {
       )}
       <Slidebar
         presentationId={presentationId}
-        onSlideSelect={(idx) => setSelectedSlide(idx)}
+        onSlideSelect={(idx) => {
+          setSelectedSlide(idx);
+          handleSlideButtonClick(idx);
+        }}
       />
       <div>{isTeam && <ChatIcon onClick={() => setChatOpen(true)} />}</div>
 
+      <button className="saveButton" onClick={() => handleSlideButtonClick(2)}>
+        ↓ 저장하기
+      </button>
       <div className="reviewContainer">
-        <button
-          className="saveButton"
-          onClick={() => handleSlideButtonClick(2)}
-        >
-          ↓ 저장하기
-        </button>
         <div className="feedback-slideId">
           {slideIds.map((id) => (
             <span
               key={id}
-              className={`slide-button ${
-                selectedSlide === id ? 'activie' : ''
-              }`}
+              className={`slide-button ${selectedSlide === id ? 'active' : ''}`}
               onClick={() => handleSlideButtonClick(id)}
             >
               슬라이드{id}
@@ -175,13 +173,12 @@ function ReviewPage() {
               <div key={f.id} className="check-item">
                 <input
                   type="checkbox"
-                  checked={checks.find((c) => c.id === f.id)?.checked || false} ///////////뭔뜻임 이상한데?
+                  checked={checks.find((c) => c.id === f.id)?.checked || false} //굳이 이게 필요?
                   onChange={() => handleCheck(f.id)}
                 />
                 <label>
                   {f.message}
-                  <br />
-                  <span className="details">{f.details}</span>
+                  <div className="details">{f.details}</div>
                 </label>
               </div>
             ))}

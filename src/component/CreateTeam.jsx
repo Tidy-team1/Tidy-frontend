@@ -47,13 +47,14 @@ function CreateTeam(props) {
       const teamRes = await axios.post('/spaces/team', {
         name: name,
       });
-
+      console.log(teamRes);
       await handleUpload(file, navigate, { isTeam: true });
     } catch (err) {
       console.error(err);
       alert('팀 생성에 실패했습니다.');
     }
     setLoading(false);
+    alert('팀 생성되었습니다!');
   };
 
   return (
