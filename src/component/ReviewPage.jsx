@@ -3,7 +3,7 @@ import './ReviewPage.css';
 import Slidebar from './Slidebar.jsx';
 import ChatIcon from './ChatIcon.jsx';
 import ChatSidebar from './ChatSidebar';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router';
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8080';
@@ -20,12 +20,15 @@ function ReviewPage() {
   const [slideIds, setSlideIds] = useState([]); //피드백 뜬 슬라이드
 
   const [taskStatus, setTaskStatus] = useState('PRCESSING');
-  const [loading, setLoading] = useState(false); //나중에 true로 바꿔야함!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  const [loading, setLoading] = useState(true);
 
   const isTeam = location.state?.isTeam || false;
   const [chatOpen, setChatOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const containerRef = useRef();
+  const [overflow, setOverflow] = useState(false);
 
-  /*useEffect(() => {
+  useEffect(() => {
     let intervalId;
 
     const fetchTask = async () => {
@@ -48,7 +51,7 @@ function ReviewPage() {
     intervalId = setInterval(fetchTask, 1500); //1.5초마다 폴링
 
     return () => clearInterval(intervalId);
-  }, [taskId]);*/
+  }, [taskId]);
 
   /*슬라이드 큰 화면에 매핑*/
   useEffect(() => {
@@ -78,6 +81,7 @@ function ReviewPage() {
       .then((res) => {
         console.log('피드백 슬라이드:', res.data);
         const ids = Array.from(new Set(res.data.map((f) => f.slideId)));
+        console.log('피드백 슬라이드:', ids);
         setSlideIds(ids);
       })
       .catch(console.error);
@@ -127,6 +131,15 @@ function ReviewPage() {
 
   const uniqueTypes = Array.from(new Set(feedbacks.map((f) => f.type)));
 
+  useEffect(() => {
+    //피드백컨테이너 오버플로우
+    if (containerRef.current) {
+      setOverflow(
+        containerRef.current.scrollHeight > containerRef.current.clientHeight
+      );
+    }
+  }, [feedbacks]);
+
   return (
     <div className="reviewPageContainer">
       {loading && (
@@ -159,11 +172,14 @@ function ReviewPage() {
             </span>
           ))}
         </div>
-        <div className="feedbackContainer">
+        <div
+          ref={containerRef}
+          className={`feedbackContainer ${expanded ? 'expanded' : ''}`}
+        >
           <div className="feedback-type">
             {uniqueTypes.map((t, i) => (
               <span key={i} className="each-type">
-                {t}dfd
+                {t}
               </span>
             ))}
           </div>
@@ -187,6 +203,14 @@ function ReviewPage() {
           <button className="modify-button" /*onClick={handleModify}*/>
             수정
           </button>
+          {overflow && (
+            <button
+              className="expand-btn"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? '▲ 닫기' : '▼ 더보기'}
+            </button>
+          )}
         </div>
 
         <div className="slidePage">

@@ -11,6 +11,7 @@
   padding: 30px;
   margin-right: 100px;
   align-items: center;
+  position: relative;
 }
 .saveButton {
   align-self: flex-start;
@@ -24,32 +25,66 @@
   font-weight: bold;
 }
 .feedback-slideId {
+  position: absolute;
+  top: 30px; /* 컨테이너 바로 위 */
+  left: 230px;
   display: flex;
-  gap: 10px;
-  z-index: 99991;
+  gap: 5px;
+  z-index: 99999;
 }
 .slide-button {
   padding: 6px 12px;
   border-radius: 4px;
-  background: #eee;
+  background: #f2dce6;
   cursor: pointer;
+  transition: all 0.25s ease;
   font-size: 14px;
 }
 .slide-button.active {
-  background: #7a8cff;
+  background: #d18aa3;
   color: white;
   font-weight: bold;
+  transform: translateY(-6px) scale(1.1);
 }
 .feedbackContainer {
   display: flex;
   align-items: center;
-  gap: 50px;
-  margin-top: 15px;
-  background-color: #d9d9d9;
+  gap: 40px;
+  margin-top: 30px;
+  background-color: rgba(222, 222, 222, 0.95);
   padding: 20px 30px;
   border-radius: 8px;
-  width: fit-content;
+  width: 800px; /* 가로 고정 */
+  max-height: 250px; /* 기본 높이 */
+  overflow: hidden;
+  transition: max-height 0.5s ease, backdrop-filter 0.3s ease;
 }
+/* 확장 모드 */
+.feedbackContainer.expanded {
+  max-height: 600px;
+  backdrop-filter: blur(2px);
+  background-color: rgba(217, 217, 217, 0.85);
+
+  position: absolute;
+  top: 50px;
+  z-index: 9999;
+}
+.expand-btn {
+  position: absolute;
+  bottom: -35px;
+  right: 20px;
+  border: none;
+  background: #ccc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.expand-btn:hover {
+  background: #b5b5b5;
+}
+
 .feedback-buttons {
   display: flex;
   flex-direction: column;
