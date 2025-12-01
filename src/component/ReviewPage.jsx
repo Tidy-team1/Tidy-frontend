@@ -14,10 +14,12 @@ function ReviewPage() {
   const [selectedSlide, setSelectedSlide] = useState(null); //슬라이드바에서 선택된 슬라이드
   const [slideImages, setSlideImages] = useState({}); //큰 화면에 매핑
 
-  const [feedbacks, setFeedbacks] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]); //한 슬라이드의 피드백
   const [scores, setScores] = useState({});
   const [checks, setChecks] = useState([]); //체크한 피드백
   const [slideIds, setSlideIds] = useState([]); //피드백 뜬 슬라이드
+
+  const [groupedFeedbacks, setGroupedFeedbacks] = useState({}); //모든 피드백
 
   const [taskStatus, setTaskStatus] = useState('PRCESSING');
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,12 @@ function ReviewPage() {
   const [expanded, setExpanded] = useState(false);
   const containerRef = useRef();
   const [overflow, setOverflow] = useState(false);
+
+  const [activeBboxes, setActiveBboxes] = useState([]); //오버레이 표시
+  const imgRef = useRef(null);
+
+  const [slideSizes, setSlideSizes] = useState({}); // 원본 크기
+  const [renderedSizes, setRenderedSizes] = useState({}); // 화면 표시 크기
 
   useEffect(() => {
     let intervalId;
@@ -59,15 +67,24 @@ function ReviewPage() {
       .get(`/presentations/${presentationId}/slides`)
       .then(async (res) => {
         const map = {};
+        const sizeMap = {};
+
         for (const s of res.data.slides) {
           const slideImgKey = s.thumbnailUrl;
           const presignedRes = await axios.get(
             `/files/presigned?key=${slideImgKey}`
           );
           map[s.slideIndex] = presignedRes.data.url;
+
+          sizeMap[s.slideIndex] = {
+            //원본 이미지 크기 저장
+            width: s.width,
+            height: s.height,
+          };
         }
 
         setSlideImages(map);
+        setSlideSizes(sizeMap);
       })
       .catch((err) => console.error(err));
   }, [presentationId]);
@@ -79,33 +96,70 @@ function ReviewPage() {
     axios
       .get(`/presentations/${presentationId}/feedbacks`)
       .then((res) => {
-        console.log('피드백 슬라이드:', res.data);
-        const ids = Array.from(new Set(res.data.map((f) => f.slideId)));
+        const fbList = res.data;
+        console.log('피드백 정보:', res.data);
+        // slideIndex 기준으로 그룹핑
+        const grouped = fbList.reduce((acc, f) => {
+          if (!acc[f.slideIndex]) acc[f.slideIndex] = [];
+          acc[f.slideIndex].push({
+            id: f.id,
+            type: f.type,
+            message: f.message,
+            details: f.details,
+            status: f.status,
+            bboxLeft: f.bboxLeft,
+            bboxTop: f.bboxTop,
+            bboxWidth: f.bboxWidth,
+            bboxHeight: f.bboxHeight,
+            shapeId: f.shapeId,
+            elementIndex: f.elementIndex,
+            slideId: f.slideId,
+            slideIndex: f.slideIndex,
+          });
+          return acc;
+        }, {});
+        setGroupedFeedbacks(grouped);
+
+        const ids = Array.from(new Set(res.data.map((f) => f.slideIndex)));
         console.log('피드백 슬라이드:', ids);
         setSlideIds(ids);
       })
       .catch(console.error);
-  }, [presentationId]);
+  }, [presentationId, taskStatus]); //task 끝나고 새 피드백
+
+  const uniqueTypes = Array.from(new Set(feedbacks.map((f) => f.type)));
+
+  useEffect(() => {
+    // 피드백 컨테이너 오버플로우 체크
+    if (containerRef.current) {
+      const isOverflowing =
+        containerRef.current.scrollHeight > containerRef.current.clientHeight;
+      setOverflow(isOverflowing);
+    }
+  }, [feedbacks]);
+
+  useEffect(() => {
+    //랜더링 되자마자 젤 첫 피드백슬라이드 띄우기
+    if (slideIds.length > 0 && selectedSlide === null) {
+      const first = slideIds[0];
+      handleSlideButtonClick(first);
+      setSelectedSlide(first);
+    }
+  }, [slideIds]);
 
   const handleSlideButtonClick = async (slideId) => {
     setSelectedSlide(slideId);
-    try {
-      const res = await axios.get(
-        `/presentations/${presentationId}/slides/${slideId}/feedbacks`
-      );
-      const mapped = res.data.map((f) => ({
-        id: f.id,
-        type: f.type,
-        message: f.message,
-        details: f.details,
-        checked: false, ///이거 필요함? setChceks에 같이 넘겨주는데
-      }));
-      setFeedbacks(mapped);
-      setChecks(mapped.map((f) => ({ id: f.id, checked: false })));
-      console.log('presentationId:', presentationId, 'slideId:', slideId);
-    } catch (err) {
-      console.error(err);
-    }
+    const fb = groupedFeedbacks[slideId] || [];
+
+    const mapped = fb.map((f) => ({
+      ...f,
+      checked: false,
+    }));
+
+    setFeedbacks(mapped);
+    setChecks(mapped.map((f) => ({ id: f.id, checked: false })));
+    setActiveBboxes([]);
+    console.log('presentationId:', presentationId, 'slideId:', slideId);
   };
 
   const handleCheck = (id) => {
@@ -114,6 +168,30 @@ function ReviewPage() {
         item.id === id ? { ...item, checked: !item.checked } : item
       )
     );
+
+    const target = feedbacks.find((f) => f.id === id);
+    if (!target) return;
+
+    const slideIndex = target.slideIndex;
+    const converted = convertBBoxToRendered(target, slideIndex);
+
+    setActiveBboxes((prev) => {
+      if (prev.some((b) => b.id === id)) {
+        // 이미 표시 중이면 제거
+        return prev.filter((b) => b.id !== id);
+      }
+      return [
+        ...prev,
+        {
+          id: target.id,
+          slideIndex: target.slideIndex,
+          left: converted.left,
+          top: converted.top,
+          width: converted.width,
+          height: converted.height,
+        },
+      ];
+    });
   };
 
   /*const handleModify = async () => {
@@ -129,16 +207,21 @@ function ReviewPage() {
     }
   };*/
 
-  const uniqueTypes = Array.from(new Set(feedbacks.map((f) => f.type)));
+  function convertBBoxToRendered(bbox, slideIndex) {
+    const original = slideSizes[slideIndex]; // { width: ?, height: ? }
+    const rendered = renderedSizes[slideIndex]; // { width: ?, height: ? }
+    if (!original || !rendered) return { left: 0, top: 0, width: 0, height: 0 }; // null 대신 기본값 반환
 
-  useEffect(() => {
-    //피드백컨테이너 오버플로우
-    if (containerRef.current) {
-      setOverflow(
-        containerRef.current.scrollHeight > containerRef.current.clientHeight
-      );
-    }
-  }, [feedbacks]);
+    const scaleX = rendered.width / original.width;
+    const scaleY = rendered.height / original.height;
+
+    return {
+      left: bbox.bboxLeft * scaleX,
+      top: bbox.bboxTop * scaleY,
+      width: bbox.bboxWidth * scaleX,
+      height: bbox.bboxHeight * scaleY,
+    };
+  }
 
   return (
     <div className="reviewPageContainer">
@@ -166,15 +249,18 @@ function ReviewPage() {
             <span
               key={id}
               className={`slide-button ${selectedSlide === id ? 'active' : ''}`}
-              onClick={() => handleSlideButtonClick(id)}
+              onClick={() => {
+                handleSlideButtonClick(id);
+                setExpanded(false);
+              }}
             >
-              슬라이드{id}
+              슬라이드{id + 1}
             </span>
           ))}
         </div>
         <div
           ref={containerRef}
-          className={`feedbackContainer ${expanded ? 'expanded' : ''}`}
+          className={`feedbackContainer${expanded ? ' expanded' : ''}`}
         >
           <div className="feedback-type">
             {uniqueTypes.map((t, i) => (
@@ -189,7 +275,7 @@ function ReviewPage() {
               <div key={f.id} className="check-item">
                 <input
                   type="checkbox"
-                  checked={checks.find((c) => c.id === f.id)?.checked || false} //굳이 이게 필요?
+                  checked={checks.find((c) => c.id === f.id)?.checked || false}
                   onChange={() => handleCheck(f.id)}
                 />
                 <label>
@@ -203,22 +289,57 @@ function ReviewPage() {
           <button className="modify-button" /*onClick={handleModify}*/>
             수정
           </button>
-          {overflow && (
+          {expanded && (
             <button
-              className="expand-btn"
-              onClick={() => setExpanded(!expanded)}
+              className="expand-btn expanded-btn"
+              onClick={() => {
+                setExpanded(false);
+                setOverflow(true);
+              }}
             >
-              {expanded ? '▲ 닫기' : '▼ 더보기'}
+              ▲
             </button>
           )}
         </div>
+        {overflow && !expanded && (
+          <button
+            className="expand-btn collapsed-btn"
+            onClick={() => setExpanded(true)}
+          >
+            ▼
+          </button>
+        )}
 
-        <div className="slidePage">
-          {currentSlideImg ? (
-            <img src={currentSlideImg} alt={`slide ${selectedSlide}`} />
-          ) : (
-            <p>슬라이드를 선택하세요.</p>
-          )}
+        <div className="slidePage" style={{ position: 'relative' }}>
+          <img
+            ref={imgRef}
+            src={slideImages[selectedSlide]}
+            onLoad={(e) => {
+              const rect = e.target.getBoundingClientRect();
+              setRenderedSizes((prev) => ({
+                ...prev,
+                [selectedSlide]: { width: rect.width, height: rect.height },
+              }));
+            }}
+          />
+          {/* activeBboxes 를 이용해 Overlay 렌더 */}
+          {activeBboxes
+            .filter((b) => b.slideIndex === selectedSlide)
+            .map((b) => (
+              <div
+                key={b.id}
+                className="bbox-overlay"
+                style={{
+                  position: 'absolute',
+                  border: '3px solid red',
+                  left: b.left,
+                  top: b.top,
+                  width: b.width,
+                  height: b.height,
+                  pointerEvents: 'none',
+                }}
+              />
+            ))}
         </div>
 
         <div className="reviewPageBottom">

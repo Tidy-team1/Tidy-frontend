@@ -4,7 +4,7 @@ nav {
   left: 0;
   width: 100%; /* 화면 전체 너비 채우기 */
   background-color: #ae778f;
-  z-index: 1000;
+  z-index: 99999;
 }
 .nav-container {
   list-style: none;

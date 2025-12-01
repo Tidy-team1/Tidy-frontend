@@ -5,11 +5,13 @@
   height: 100vh;
 }
 .reviewContainer {
+  margin-left: 300px;
+  margin-top: 10px;
   display: flex;
-  flex: 1; /*남은 공간 모두 차지*/
+  width: 900px;
   flex-direction: column;
   padding: 30px;
-  margin-right: 100px;
+  margin-right: 20px;
   align-items: center;
   position: relative;
 }
@@ -27,10 +29,10 @@
 .feedback-slideId {
   position: absolute;
   top: 30px; /* 컨테이너 바로 위 */
-  left: 230px;
+  left: 80px;
   display: flex;
   gap: 5px;
-  z-index: 99999;
+  z-index: 9999;
 }
 .slide-button {
   padding: 6px 12px;
@@ -48,54 +50,61 @@
 }
 .feedbackContainer {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   gap: 40px;
   margin-top: 30px;
-  background-color: rgba(222, 222, 222, 0.95);
+  background-color: #d8d2d6;
   padding: 20px 30px;
   border-radius: 8px;
   width: 800px; /* 가로 고정 */
-  max-height: 250px; /* 기본 높이 */
-  overflow: hidden;
-  transition: max-height 0.5s ease, backdrop-filter 0.3s ease;
+  max-height: 110px; /* 기본 높이 */
+  overflow: auto;
+  transition: max-height 0.1s ease;
+  position: relative; /*expand-btn 보이게*/
+  box-shadow: 0 0 10px 5px #ae778fab;
 }
-/* 확장 모드 */
 .feedbackContainer.expanded {
-  max-height: 600px;
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  margin-top: 30px;
+  width: 800px;
+  max-height: 2000px;
   backdrop-filter: blur(2px);
-  background-color: rgba(217, 217, 217, 0.85);
-
-  position: absolute;
-  top: 50px;
-  z-index: 9999;
+  background-color: #d9cdd3;
+  padding: 20px 30px;
+  border-radius: 8px;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 0 10px 5px #ae778fab;
 }
-.expand-btn {
+.expanded-btn {
   position: absolute;
-  bottom: -35px;
-  right: 20px;
+  left: 50%;
+  bottom: 0px;
   border: none;
-  background: #ccc;
+  background: #e3e3e37c;
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.2s;
+  z-index: 99999;
 }
 .expand-btn:hover {
   background: #b5b5b5;
 }
-
-.feedback-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 20px;
-  min-width: 650px;
+.collapsed-btn {
+  position: relative;
+  border: none;
+  background: #e3e3e37c;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 .feedback-type {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   font-weight: bold;
 }
 .each-type {
@@ -103,6 +112,7 @@
   background: white;
   padding: 4px 8px;
   border-radius: 4px;
+  box-shadow: 0 0 5px 3px rgba(255, 255, 255, 0.456);
 }
 .feedback-checks {
   display: flex;
@@ -134,10 +144,12 @@
   line-height: 1.4;
 }
 .modify-button {
+  width: 60px;
+  height: 40px;
   background-color: #ae778f;
   color: white;
   border: none;
-  padding: 8px 15px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 17px;
@@ -153,13 +165,19 @@
   width: 888px;
   height: 500px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 }
 .slidePage img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain; /* 박스 안에 비율 유지하며 맞춤 */
+  position: relative;
+}
+.bbox-overlay {
+  position: absolute;
+  border: 3px solid red;
+  pointer-events: none; /* 클릭 막아서 체크박스랑 UI 충돌 안 나게*/
+  box-sizing: border-box;
 }
 .reviewPageBottom {
   display: flex;

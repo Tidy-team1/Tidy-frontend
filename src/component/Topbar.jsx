@@ -39,7 +39,7 @@ function Topbar({ onLoginClick }) {
     <nav>
       <ul className="nav-container">
         <li className="nav-item">
-          <a href="">HOME</a>
+          <a href="/">HOME</a>
         </li>
         <li className="nav-item">
           <a href="">개인 워크스페이스</a>

@@ -1,12 +1,14 @@
 .slidebar {
   width: 200px;
   padding: 10px;
+  margin-bottom: 50px;
   display: flex;
   flex-direction: column;
   gap: 5px;
   overflow-y: auto;
   background: #c1b0b0;
-  height: 100vh;
+  height: 92vh;
+  position: fixed;
 }
 .eachSlide {
   display: flex;

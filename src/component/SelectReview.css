@@ -9,7 +9,7 @@
   top: 40%;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px 5px #ae778fab;
 }
 .selectContainer p {
   display: inline-block;

@@ -24,7 +24,7 @@
 }
 .dragLoad {
   background: #d9d9d9;
-  border: 2px dashed #ccc;
+  box-shadow: 0 0 10px 5px #ae778fab;
   color: #555;
   width: 600px;
   height: 350px;
