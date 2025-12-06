@@ -4,13 +4,24 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 axios.defaults.baseURL = 'http://localhost:8080';
 
-function Slidebar({ presentationId, onSlideSelect }) {
+function Slidebar({
+  presentationId,
+  slides: modifiedRealThumb,
+  onSlideSelect,
+}) {
   const [slides, setSlides] = useState([]);
 
   useEffect(() => {
     if (!presentationId) return;
     console.log('pptId:', presentationId);
-    axios
+
+    if (modifiedRealThumb && modifiedRealThumb.length > 0) {
+      setSlides(modifiedRealThumb);
+      console.log('수정된 슬라이드 set됨');
+      return;
+    }
+
+    axios //수정 전 초기 슬라이드 상태
       .get(`/presentations/${presentationId}/slides`)
       .then(async (res) => {
         const slideList = res.data.slides;
@@ -28,6 +39,7 @@ function Slidebar({ presentationId, onSlideSelect }) {
         );
 
         setSlides(slidesWithRealUrl);
+        console.log('처음 슬라이드바:', slidesWithRealUrl);
       })
       .catch((err) => {
         console.error(err);
@@ -49,27 +61,31 @@ function Slidebar({ presentationId, onSlideSelect }) {
           },
         ]);
       });
-  }, [presentationId]);
+  }, [presentationId, modifiedRealThumb]);
 
   return (
     <div className="slidebar">
-      {slides.map((slide) => (
-        <div
-          key={slide.id}
-          className="eachSlide"
-          onClick={() => {
-            onSlideSelect(slide.slideIndex);
-            console.log('slide.slideIndex: ', slide.slideIndex);
-          }}
-        >
-          <img
-            key={slide.slideIndex}
-            src={slide.realThumbnail}
-            alt={`Slide${slide.slideIndex}`}
-          ></img>
-          <p>{slide.slideIndex + 1}</p>
-        </div>
-      ))}
+      {slides.map((slide, idx) => {
+        const index = slide.slideIndex ?? idx;
+        console.log(slide.realThumbnail);
+        return (
+          <div
+            key={index}
+            className="eachSlide"
+            onClick={() => {
+              onSlideSelect(index);
+              console.log('index:', index);
+            }}
+          >
+            <img
+              key={index}
+              src={slide.realThumbnail}
+              alt={`Slide${index}`}
+            ></img>
+            <p>{index + 1}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }

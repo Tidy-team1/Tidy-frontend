@@ -10,7 +10,8 @@ axios.defaults.baseURL = 'http://localhost:8080';
 
 function ReviewPage() {
   const location = useLocation();
-  const { presentationId, taskId } = location.state;
+  const { presentationId, taskId: initialTaskId } = location.state;
+  const [taskId, setTaskId] = useState(initialTaskId);
   const [selectedSlide, setSelectedSlide] = useState(null); //슬라이드바에서 선택된 슬라이드
   const [slideImages, setSlideImages] = useState({}); //큰 화면에 매핑
 
@@ -36,6 +37,8 @@ function ReviewPage() {
   const [slideSizes, setSlideSizes] = useState({}); // 원본 크기
   const [renderedSizes, setRenderedSizes] = useState({}); // 화면 표시 크기
 
+  const [slidebarSlides, setSlidebarSlides] = useState([]);
+
   useEffect(() => {
     let intervalId;
 
@@ -43,11 +46,24 @@ function ReviewPage() {
       try {
         const res = await axios.get(`/tasks/${taskId}`);
         const status = res.data.status;
+        const taskType = res.data.taskType;
+        console.log(taskType);
+        console.log(status);
 
         setTaskStatus(status);
 
-        if (status === 'DONE') {
+        if (status === 'DONE' && taskType === 'REVIEW_ANALYSIS') {
           clearInterval(intervalId);
+          setLoading(false);
+        }
+        if (status === 'DONE' && taskType === 'MODIFY') {
+          clearInterval(intervalId);
+          const newVersion = res.data.newVersion;
+          console.log('newVersion:', newVersion);
+
+          if (newVersion) {
+            await fetchNewVersionSlides(newVersion);
+          }
           setLoading(false);
         }
       } catch (err) {
@@ -194,18 +210,65 @@ function ReviewPage() {
     });
   };
 
-  /*const handleModify = async () => {
-    const selected = checks.filter((c) => c.checked);
-    try {
-      for (const item of selected) {
-        await axios.post(
-          `/presentations/${presentationId}/slides/${issue.slideIndex}/elements/${issue.elementId}/apply`
-        );
-      }
-    } catch (error) {
-      console.error(error);
+  const handleModify = async () => {
+    const selectedFeedbackIds = checks
+      .filter((c) => c.checked)
+      .map((c) => c.id);
+
+    if (selectedFeedbackIds.length === 0) {
+      alert('수정할 항목을 선택하세요.');
+      return;
     }
-  };*/
+    try {
+      const res = await axios.post(`/presentations/${presentationId}/apply`, {
+        feedbackIds: selectedFeedbackIds,
+      });
+      const newTaskId = res.data.taskId;
+      console.log('new taskId:', newTaskId);
+
+      setTaskStatus('PROCESSING');
+      setTaskId(newTaskId); //이후 fetchTask 수행됨
+      setLoading(true);
+    } catch (error) {
+      console.error('수정요청 실패:', error);
+    }
+  };
+
+  const fetchNewVersionSlides = async (newVersion) => {
+    try {
+      const res = await axios.get(
+        `presentations/${presentationId}/versions/${newVersion}/slides`
+      );
+
+      const slides = res.data.slides;
+      const keys = slides.map((s) => s.imageKey);
+      console.log(keys);
+
+      const batchRes = await axios.post(`/files/presigned/batch`, {
+        keys: keys,
+      });
+
+      const urlMap = batchRes.data.urls;
+
+      //Slidebar에 전달할 props
+      const mappedSlides = slides.map((slide) => ({
+        ...slide,
+        slideIndex: slide.index,
+        realThumbnail: urlMap[slide.imageKey], //urlMap응답에서 실제주소만 가져옴
+      }));
+      console.log(mappedSlides);
+      setSlidebarSlides([...mappedSlides]);
+
+      //큰 화면에도 매핑 이미지 업데이트
+      const newSlideImages = {};
+      mappedSlides.forEach((s) => {
+        newSlideImages[s.slideIndex] = s.realThumbnail;
+      });
+      setSlideImages(newSlideImages);
+    } catch (err) {
+      console.error('수정된 슬라이드표시 실패:', err);
+    }
+  };
 
   function convertBBoxToRendered(bbox, slideIndex) {
     const original = slideSizes[slideIndex]; // { width: ?, height: ? }
@@ -233,6 +296,7 @@ function ReviewPage() {
       )}
       <Slidebar
         presentationId={presentationId}
+        slides={slidebarSlides} //수정반영된 슬라이드들 다시 전달
         onSlideSelect={(idx) => {
           setSelectedSlide(idx);
           handleSlideButtonClick(idx);
@@ -286,7 +350,7 @@ function ReviewPage() {
             ))}
           </div>
 
-          <button className="modify-button" /*onClick={handleModify}*/>
+          <button className="modify-button" onClick={handleModify}>
             수정
           </button>
           {expanded && (
