@@ -2,6 +2,7 @@ import React from 'react';
 import './topbar.css';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 function Topbar({ onLoginClick }) {
   //Topbar컴포넌트에서는 onLoginClick판단
@@ -39,10 +40,10 @@ function Topbar({ onLoginClick }) {
     <nav>
       <ul className="nav-container">
         <li className="nav-item">
-          <a href="/">HOME</a>
+          <Link to="/">HOME</Link>
         </li>
         <li className="nav-item">
-          <a href="">개인 워크스페이스</a>
+          <Link to="/personalSpace">개인 워크스페이스</Link>
           <ul className="submenu">
             <li className="list">
               <a href=""></a>
@@ -63,7 +64,7 @@ function Topbar({ onLoginClick }) {
           </ul>
         </li>
         <li className="nav-item">
-          <a href="">팀 워크스페이스</a>
+          <Link to="/teamSpace">팀 워크스페이스</Link>
           <ul className="submenu">
             <li className="list">
               <a href=""></a>

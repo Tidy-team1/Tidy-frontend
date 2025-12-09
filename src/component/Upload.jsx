@@ -31,6 +31,7 @@ export const handleUpload = async (file, navigate, extraState = {}) => {
 
     const newPresentationId = uploadRes.data.id;
     console.log('업로드 완료');
+
     navigate('/select', {
       state: { presentationId: newPresentationId, ...extraState },
     });
@@ -73,7 +74,7 @@ function Upload() {
       return (
         <>
           드래그하여 업로드 하세요.
-          <img src="/upload.png" />
+          <div className="file-icon">📄</div>
         </>
       );
     if (file.type.startsWith('image/')) {

@@ -5,7 +5,7 @@
   height: 100vh;
 }
 .reviewContainer {
-  margin-left: 300px;
+  margin-left: 400px;
   margin-top: 10px;
   display: flex;
   width: 900px;
@@ -16,9 +16,10 @@
   position: relative;
 }
 .saveButton {
+  position: absolute;
   align-self: flex-start;
   margin-top: 30px;
-  margin-left: 30px;
+  margin-left: 300px;
   background: none;
   border: none;
   color: #555;
@@ -143,6 +144,10 @@
   color: #555;
   line-height: 1.4;
 }
+.modify-button-container {
+  display: flex;
+  flex-direction: column;
+}
 .modify-button {
   width: 60px;
   height: 40px;
@@ -150,13 +155,29 @@
   color: white;
   border: none;
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
   font-size: 17px;
   letter-spacing: 2px;
 }
 .modify-button:hover {
   background-color: #844861;
+}
+.before-button {
+  margin-top: 10px;
+  width: 70px;
+  height: 30px;
+  background-color: #acacac;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 5px 5px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.before-button:hover {
+  background-color: #898989;
 }
 .slidePage {
   background-color: #e0e0e0; /* 이미지의 중앙 회색 영역 */

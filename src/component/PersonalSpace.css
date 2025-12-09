@@ -1,0 +1,91 @@
+.workspace-container {
+  padding: 50px 100px;
+  width: 100vw;
+  height: 100vh;
+}
+.workspace-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #3d3d3d;
+}
+.workspace-subtitle {
+  margin-top: 4px;
+  margin-bottom: 32px;
+  color: #8c8c8c;
+  font-size: 16px;
+}
+.stats-row {
+  margin-left: 30px;
+  margin-right: 30px;
+  display: flex;
+  gap: 30px;
+}
+.stat-card {
+  flex: 1;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0e6ef;
+}
+.stat-label {
+  font-size: 15px;
+  color: #8a8a8a;
+  margin-bottom: 10px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #c59ab8;
+}
+.file-area {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 40px;
+  background: #ebebeb;
+  border-radius: 20px;
+  padding: 40px;
+  padding-bottom: 100px;
+  min-height: 350px;
+  border: 1px solid #f0e6ef;
+}
+.empty-box {
+  text-align: center;
+  padding-top: 30px;
+}
+.empty-icon {
+  font-size: 60px;
+  color: #d4b4cd;
+}
+.empty-title {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.empty-text {
+  margin-top: 4px;
+  color: #8f8f8f;
+  font-size: 14px;
+}
+.upload-btn {
+  margin-top: 16px;
+  display: inline-block;
+  padding: 12px 22px;
+  background: #c79fbe;
+  color: white;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 15px;
+  border: none;
+}
+.upload-btn:hover {
+  background: #ae778f;
+}
+.file-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /*한줄에 3개*/
+  gap: 40px 80px;
+  width: fit-content;
+  margin: 0 auto;
+}

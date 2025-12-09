@@ -8,6 +8,8 @@ import SelectReview from './component/SelectReview.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReviewPage from './component/ReviewPage.jsx';
 import CreateTeam from './component/CreateTeam.jsx';
+import PersonalSpace from './component/PersonalSpace.jsx';
+import TeamSpace from './component/TeamSpace.jsx';
 
 function App() {
   let post = '불러온 API 저장';
@@ -18,7 +20,7 @@ function App() {
       <div className="app">
         <Topbar onLoginClick={() => setShowLogin(true)} />
         {showLogin && <Login onClose={() => setShowLogin(false)} />}{' '}
-        {/*showLogin && <Login/>은 showLogin이 true일 때 <Login/>을 띄운다는 걸 의미*/}
+        {/*showLogin이 true일 때 <Login/>띄우기*/}
         <Routes>
           <Route
             path="/"
@@ -48,6 +50,8 @@ function App() {
             }
           />
           <Route path="/review" element={<ReviewPage />} />
+          <Route path="/personalSpace" element={<PersonalSpace />} />
+          <Route path="/teamSpace" element={<TeamSpace />} />
         </Routes>
       </div>
     </BrowserRouter>

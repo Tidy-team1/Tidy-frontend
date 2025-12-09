@@ -38,6 +38,9 @@ function ReviewPage() {
   const [renderedSizes, setRenderedSizes] = useState({}); // 화면 표시 크기
 
   const [slidebarSlides, setSlidebarSlides] = useState([]);
+  const [isModified, setIsModified] = useState(false);
+
+  const [undoStack, setUndoStack] = useState([]); //반영된 피드백 저장 (수정 전 클릭때 필요)
 
   useEffect(() => {
     let intervalId;
@@ -229,6 +232,38 @@ function ReviewPage() {
       setTaskStatus('PROCESSING');
       setTaskId(newTaskId); //이후 fetchTask 수행됨
       setLoading(true);
+
+      // 수정할 피드백들 저장
+      const removedFeedbacks = feedbacks.filter((f) =>
+        selectedFeedbackIds.includes(f.id)
+      );
+      const removedChecks = checks.filter((c) =>
+        selectedFeedbackIds.includes(c.id)
+      );
+      const removedBboxes = activeBboxes.filter((b) =>
+        selectedFeedbackIds.includes(b.id)
+      );
+
+      setUndoStack((prev) => [
+        ...prev,
+        {
+          feedbacks: removedFeedbacks,
+          checks: removedChecks,
+          bboxes: removedBboxes,
+        },
+      ]);
+
+      //수정 후 남겨야하는 피드백만 보여주기
+      setFeedbacks((prev) =>
+        prev.filter((f) => !selectedFeedbackIds.includes(f.id))
+      );
+      setChecks((prev) =>
+        prev.filter((c) => !selectedFeedbackIds.includes(c.id))
+      );
+      setActiveBboxes((prev) =>
+        prev.filter((b) => !selectedFeedbackIds.includes(b.id))
+      );
+      setIsModified(true);
     } catch (error) {
       console.error('수정요청 실패:', error);
     }
@@ -268,6 +303,67 @@ function ReviewPage() {
     } catch (err) {
       console.error('수정된 슬라이드표시 실패:', err);
     }
+  };
+
+  const undoSlides = async () => {
+    try {
+      const undoRes = await axios.post(`presentations/${presentationId}/undo`);
+      const version = undoRes.data.currentVersion;
+      const undoKeys = undoRes.data.slideKeys;
+
+      const batchRes = await axios.post(`/files/presigned/batch`, {
+        keys: undoKeys,
+      });
+      const urlMap = batchRes.data.urls;
+      const mappedSlides = undoKeys.map((key, index) => ({
+        imageKey: key,
+        slideIndex: index,
+        realThumbnail: urlMap[key],
+      }));
+      setSlidebarSlides(mappedSlides);
+      const newSlideImages = {};
+      mappedSlides.forEach((s) => {
+        newSlideImages[s.slideIndex] = s.realThumbnail;
+      });
+      setSlideImages(newSlideImages);
+
+      let last = null; //undo스택 pop대상
+      let newStackLen = null;
+      setUndoStack((prev) => {
+        if (prev.length === 0) {
+          newStackLen = 0;
+          return prev;
+        }
+        last = prev[prev.length - 1];
+        newStackLen = prev.length - 1;
+        const newStack = prev.slice(0, -1); //UndoStack에서 pop 한 스택 저장
+
+        return newStack;
+      });
+
+      if (last) {
+        setFeedbacks([...last.feedbacks]);
+        setChecks([...last.checks]);
+        setActiveBboxes([...last.bboxes]);
+      }
+
+      //if (newStackLen == 0) setIsModified(false);
+      //setIsModified적용 안될수 있어서 useEffect로 자동 동기화
+    } catch (err) {
+      console.error('수정 전으로 실패:', err);
+    }
+  };
+
+  useEffect(() => {
+    setIsModified(undoStack.length > 0);
+  }, [undoStack]);
+
+  const mergeUnique = (prev, added) => {
+    //피드백 중복 제거 함수
+    const map = new Map();
+    prev.forEach((item) => map.set(item.id, item));
+    added.forEach((item) => map.set(item.id, item));
+    return [...map.values()];
   };
 
   function convertBBoxToRendered(bbox, slideIndex) {
@@ -349,10 +445,25 @@ function ReviewPage() {
               </div>
             ))}
           </div>
+          <div className="modify-button-container">
+            <button
+              type="button"
+              className="modify-button"
+              onClick={() => handleModify()}
+            >
+              수정
+            </button>
+            {isModified ? (
+              <button
+                type="button"
+                className="before-button"
+                onClick={() => undoSlides()}
+              >
+                수정 전
+              </button>
+            ) : null}
+          </div>
 
-          <button className="modify-button" onClick={handleModify}>
-            수정
-          </button>
           {expanded && (
             <button
               className="expand-btn expanded-btn"
