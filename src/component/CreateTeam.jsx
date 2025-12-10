@@ -22,21 +22,6 @@ function CreateTeam(props) {
     setEmail(''); //입력창 초기화
   };
 
-  /*const handleInvite = async () => {
-    if (email.trim() === '') return;
-    try {
-    const res = await axios.post(`/workspaces/members`, { /////api수정됐는지 확인
-      email: email,
-      role: "EDITOR"
-    });
-    const invited = res.data.invitedMember;
-    setInvitedMembers([...invitedMembers, {email: email, name: invited.name}]);
-    setEmail(''); //입력창 초기화
-  }catch (err) {
-    console.error(err);
-    alert("초대에 실패했습니다.");
-  }*/
-
   const handleCreate = async () => {
     if (!file) return alert('업로드할 파일이 없습니다.');
     if (!name.trim()) return alert('팀 이름을 입력하세요.');
@@ -44,11 +29,24 @@ function CreateTeam(props) {
     setLoading(true);
 
     try {
-      const teamRes = await axios.post('/spaces/team', {
+      const memberList = invitedMembers.map((email) => ({
+        email: email,
+        role: 'MEMBER',
+      }));
+      const teamRes = await axios.post(`/spaces/team-with-members`, {
         name: name,
+        members: memberList,
       });
-      console.log(teamRes);
-      await handleUpload(file, navigate, { isTeam: true });
+
+      console.log('팀 생성 성공:', teamRes.data);
+      const teamSpaceId = teamRes.data.spaceId;
+      const memberNames = teamRes.data.invitedMembers.map((m) => m.name);
+
+      await handleUpload(file, navigate, {
+        isTeam: true,
+        teamSpaceId: teamSpaceId,
+        memberNames: memberNames,
+      });
     } catch (err) {
       console.error(err);
       alert('팀 생성에 실패했습니다.');
@@ -68,7 +66,11 @@ function CreateTeam(props) {
 
       <div className="titleContainer">
         <span> 팀 워크스페이스 생성</span>
-        <button>기존 팀 워크스페이스 선택</button>
+        <button
+          onClick={() => navigate('/TeamSpace', { state: { file: file } })}
+        >
+          기존 팀 워크스페이스 선택
+        </button>
       </div>
       <div className="teamCreateContainer">
         <div className="addedMember">

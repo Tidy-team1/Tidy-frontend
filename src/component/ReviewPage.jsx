@@ -16,7 +16,7 @@ function ReviewPage() {
   const [slideImages, setSlideImages] = useState({}); //큰 화면에 매핑
 
   const [feedbacks, setFeedbacks] = useState([]); //한 슬라이드의 피드백
-  const [scores, setScores] = useState({});
+  const [slideScores, setSlideScores] = useState([]);
   const [checks, setChecks] = useState([]); //체크한 피드백
   const [slideIds, setSlideIds] = useState([]); //피드백 뜬 슬라이드
 
@@ -165,6 +165,25 @@ function ReviewPage() {
       setSelectedSlide(first);
     }
   }, [slideIds]);
+
+  useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        const res = await axios.get(`presentations/${presentationId}/scores`);
+        setSlideScores(res.data.scores);
+      } catch (err) {
+        console.error('점수 불러오기 실패:', err);
+      }
+    };
+
+    fetchScores();
+  }, [presentationId]);
+
+  const currentScore = slideScores.find((s) => s.slideIndex === selectedSlide);
+
+  const readability = currentScore?.readabilityScore ?? '-';
+  const aesthetic = currentScore?.aestheticScore ?? '-';
+  const consistency = currentScore?.consistencyScore ?? '-';
 
   const handleSlideButtonClick = async (slideId) => {
     setSelectedSlide(slideId);
@@ -521,15 +540,15 @@ function ReviewPage() {
           <div className="score-section">
             <div className="score-item">
               <span className="score-label">가독성</span>
-              <span className="score-value">45점</span>
+              <span className="score-value">{readability}점</span>
             </div>
             <div className="score-item">
               <span className="score-label">심미성</span>
-              <span className="score-value">90점</span>
+              <span className="score-value">{aesthetic}점</span>
             </div>
             <div className="score-item">
               <span className="score-label">일관성</span>
-              <span className="score-value">50점</span>
+              <span className="score-value">{consistency}점</span>
             </div>
           </div>
           <div className="script-section">

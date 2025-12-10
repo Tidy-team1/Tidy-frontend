@@ -2,12 +2,16 @@ import React from 'react';
 import './topbar.css';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.withCredentials = true;
 
 function Topbar({ onLoginClick }) {
   //Topbar컴포넌트에서는 onLoginClick판단
   const [isLogIn, setIsLogIn] = useState(false);
   const [userName, setUserName] = useState('');
+  const navigate = useNavigate();
 
   //페이지 로드 시 /me API로 로그인 여부 확인
   useEffect(() => {
@@ -31,7 +35,16 @@ function Topbar({ onLoginClick }) {
       });
   }, []);
 
-  const logout = () => {
+  const logout = async () => {
+    const wantLogout = window.confirm('로그아웃 하시겠습니까?');
+    if (!wantLogout) return;
+
+    try {
+      await axios.post('/auth/logout', {}, { withCredentials: true });
+    } catch (err) {
+      console.error('로그아웃 실패:', err);
+    }
+    navigate('/');
     setIsLogIn(false);
     setUserName('');
   };

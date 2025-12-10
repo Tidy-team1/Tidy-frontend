@@ -13,14 +13,22 @@ export const handleUpload = async (file, navigate, extraState = {}) => {
   }
 
   try {
-    // 2. 사용자 정보 조회
-    const meRes = await axios.get('/auth/me', { withCredentials: true });
-    const personalSpaceId = meRes.data.personalSpaceId;
+    let targetSpaceId;
+
+    if (extraState.teamSpaceId) {
+      // 팀 워크스페이스로 업로드
+      targetSpaceId = extraState.teamSpaceId;
+    } else {
+      // 개인 워크스페이스로 업로드 (사용자 정보 조회)
+      const meRes = await axios.get('/auth/me', { withCredentials: true });
+      targetSpaceId = meRes.data.personalSpaceId;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
     const uploadRes = await axios.post(
-      `/spaces/${personalSpaceId}/presentations`,
+      `/spaces/${targetSpaceId}/presentations`,
       formData,
       {
         headers: {
@@ -37,7 +45,6 @@ export const handleUpload = async (file, navigate, extraState = {}) => {
     });
   } catch (error) {
     console.error('백그라운드 업로드 실패:', error);
-  } finally {
   }
 };
 
@@ -106,6 +113,10 @@ function Upload() {
     setLoading(false);
   };
   const handleTeam = () => {
+    if (!file) {
+      alert('파일을 먼저 선택하세요.');
+      return;
+    }
     navigate('/createTeam', { state: { file } });
   };
 

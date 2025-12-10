@@ -1,15 +1,10 @@
-.buttonContainer button {
-  background: rgba(200, 144, 167, 0.7);
-  border-radius: 10px;
-  width: 300px;
-  height: 70px;
-  box-shadow: 0px 3px 3px 3px rgba(0, 0, 0, 0.25);
-  border: none;
-  font-size: 12pt;
-}
 .fileSelect {
   position: absolute;
   top: 45%;
+  padding: 5px;
+  border: none;
+  cursor: pointer;
+  background-color: #e8e8e8;
 }
 .loadContainer {
   display: flex;
@@ -20,11 +15,11 @@
 }
 .uploadP {
   position: absolute;
-  top: 40%;
+  top: 39%;
 }
 .dragLoad {
   background: #e2e2e2;
-  box-shadow: 0 0 10px 5px #ae778fab;
+  box-shadow: 0 0 15px 3px #ae778fb3;
   color: #555;
   width: 600px;
   height: 350px;
@@ -40,6 +35,24 @@
   flex-direction: column;
   gap: 50px;
 }
+
+.buttonContainer button {
+  background: rgba(200, 144, 167, 0.7);
+  border-radius: 10px;
+  width: 300px;
+  height: 70px;
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+  border: none;
+  font-size: 12pt;
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.buttonContainer button:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0px 3px 10px 3px rgba(0, 0, 0, 0.25);
+  border-color: #d4b4cd;
+}
+
 .uploaded-file {
   display: flex;
   align-items: center;

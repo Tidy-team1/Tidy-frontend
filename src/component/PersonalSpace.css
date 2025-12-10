@@ -29,8 +29,8 @@
   border: 1px solid #f0e6ef;
 }
 .stat-label {
-  font-size: 15px;
-  color: #8a8a8a;
+  font-size: 16px;
+  color: #333;
   margin-bottom: 10px;
 }
 .stat-value {

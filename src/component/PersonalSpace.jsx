@@ -31,7 +31,7 @@ function PersonalSpace() {
 
       setFiles(merged);
     } catch (e) {
-      console.error(e);
+      console.error('개인 워크스페이스 조회 실패:', e);
     }
   };
 
