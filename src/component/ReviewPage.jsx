@@ -89,6 +89,8 @@ function ReviewPage() {
   const [clickedBboxId, setClickedBboxId] = useState(null);
   const [selectedFeedbackId, setSelectedFeedbackId] = useState(null); // 채팅창에 연결할 피드백 ID
 
+  const [selectedSlideChat, setSelecteSlideChat] = useState(null); //코멘트 post에 쓰일 슬라이드id
+
   useEffect(() => {
     let intervalId;
 
@@ -134,6 +136,8 @@ function ReviewPage() {
       .then(async (res) => {
         const map = {};
         const sizeMap = {};
+
+        setSelecteSlideChat(res.data.slides);
 
         for (const s of res.data.slides) {
           const slideImgKey = s.thumbnailUrl;
@@ -463,18 +467,18 @@ function ReviewPage() {
 
   const handleSave = async () => {
     try {
-      const backend = "http://localhost:8080";
+      const backend = 'http://localhost:8080';
       const url = `${backend}/presentations/${presentationId}/download`;
 
       const res = await fetch(url, {
-        method: "GET",
-        credentials: "include",
+        method: 'GET',
+        credentials: 'include',
       });
 
       const blob = await res.blob();
 
       // Content-Disposition에서 파일명 추출
-      const disposition = res.headers.get("Content-Disposition");
+      const disposition = res.headers.get('Content-Disposition');
       let filename = null;
 
       if (disposition) {
@@ -491,16 +495,15 @@ function ReviewPage() {
         }
       }
 
-if (!filename) filename = "presentation.pptx";
+      if (!filename) filename = 'presentation.pptx';
 
-
-      // 🔥 filename이 여전히 null이면 fallback
-      if (!filename) filename = "presentation.pptx";
+      // filename이 여전히 null이면 fallback
+      if (!filename) filename = 'presentation.pptx';
 
       // blob URL 생성
       const downloadUrl = window.URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = downloadUrl;
       a.download = filename; // ← 파일명이 정확히 적용됨
       document.body.appendChild(a);
@@ -509,10 +512,9 @@ if (!filename) filename = "presentation.pptx";
 
       window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
-      console.error("다운로드 실패:", err);
+      console.error('다운로드 실패:', err);
     }
   };
-
 
   return (
     <div className="reviewPageContainer">
@@ -640,8 +642,12 @@ if (!filename) filename = "presentation.pptx";
                 onHover={setHoveredBboxId}
                 onLeave={() => setHoveredBboxId(null)}
                 onClick={handleBboxClick}
-                isHovered={hoveredBboxId === b.id}
-                isClicked={clickedBboxId === b.id}
+                isHovered={
+                  hoveredBboxId === b.id || selectedFeedbackId === b.id
+                }
+                isClicked={
+                  clickedBboxId === b.id || selectedFeedbackId === b.id
+                }
               />
             ))}
         </div>
@@ -671,8 +677,16 @@ if (!filename) filename = "presentation.pptx";
         open={chatOpen}
         onClose={handleChatClose}
         selectedSlide={selectedSlide}
+        selectedSlideId={selectedSlideChat[selectedSlide]?.id}
         selectedFeedbackId={selectedFeedbackId}
         presentationId={presentationId}
+        onSelectCommentSlide={(slideIndex) => setSelectedSlide(slideIndex)}
+        onSelectCommentFeedback={(fid) => {
+          setSelectedFeedbackId(fid);
+          setClickedBboxId(fid); // 클릭 효과
+          setHoveredBboxId(fid); // 호버 효과
+        }}
+        slideList={selectedSlideChat} //slideId -> slideIndex 매핑용
       />
     </div>
   );

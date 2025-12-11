@@ -7,8 +7,12 @@ function ChatSidebar({
   open,
   onClose,
   selectedSlide,
+  selectedSlideId,
   selectedFeedbackId,
   presentationId,
+  onSelectCommentSlide,
+  onSelectCommentFeedback,
+  slideList,
 }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -28,29 +32,29 @@ function ChatSidebar({
     fetchUserId();
   }, [open]);
 
+  const fetchComments = async () => {
+    if (!open) return;
+    try {
+      const res = await axios.get(`/presentations/${presentationId}/comments`);
+      console.log('코멘트 응답:', res.data);
+
+      const converted = res.data.map((c) => ({
+        id: c.id,
+        text: c.content,
+        sender: c.userId === userId ? 'me' : 'team',
+        slideId: c.slideId,
+        userName: c.userName,
+        createdAt: c.createdAt,
+        feedbackIds: c.feedbackIds,
+      }));
+      setMessages(converted);
+    } catch (err) {
+      console.error('코멘트 get 실패:', err);
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
-    const fetchComments = async () => {
-      try {
-        const res = await axios.get(
-          `/presentations/${presentationId}/comments`
-        );
-        console.log('코멘트 응답:', res.data);
-
-        const converted = res.data.map((c) => ({
-          id: c.id,
-          text: c.content,
-          sender: c.userId === userId ? 'me' : 'team',
-          slideId: c.slideId,
-          userName: c.userName,
-          createdAt: c.createdAt,
-          feedbackIds: c.feedbackIds,
-        }));
-        setMessages(converted);
-      } catch (err) {
-        console.error('코멘트 get 실패:', err);
-      }
-    };
 
     fetchComments();
   }, [open, userId, presentationId]);
@@ -63,8 +67,9 @@ function ChatSidebar({
     };
 
     try {
+      console.log(selectedSlideId);
       const res = await axios.post(
-        `/slides/${selectedSlide}/comments`,
+        `/slides/${selectedSlideId}/comments`,
         payload
       );
       console.log(`코멘트post 응답:`, res.data);
@@ -81,6 +86,8 @@ function ChatSidebar({
 
       setMessages((prev) => [...prev, newComment]);
       setInput('');
+
+      await fetchComments();
     } catch (err) {
       console.error('코멘트 post 실패:', err);
     }
@@ -108,8 +115,13 @@ function ChatSidebar({
             style={{ cursor: msg.slideId ? 'pointer' : 'default' }}
             onClick={() => {
               if (msg.slideId) {
+                const target = slideList.find((s) => s.id === msg.slideId); //slideId로 slideIndex 찾기
                 console.log(`코멘트 슬라이드:`, msg.slideId);
-                //selectedSlide(msg.slideId); //해당 슬라이드로 이동되는지 확인 필요
+                onSelectCommentSlide(target.slideIndex);
+
+                if (msg.feedbackIds && msg.feedbackIds.length > 0) {
+                  onSelectCommentFeedback(msg.feedbackIds[0]);
+                }
               }
             }}
           >
