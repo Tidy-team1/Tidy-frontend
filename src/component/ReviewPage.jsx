@@ -463,9 +463,12 @@ function ReviewPage() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/presentations/${presentationId}/download`, {
-        method: 'GET',
-      });
+      const res = await fetch(
+        `http://localhost:8080/presentations/${presentationId}/download`,
+        {
+          method: 'GET',
+        }
+      );
 
       // 모든 헤더 출력
       console.log('🔍 전체 응답 헤더:', [...res.headers.entries()]);

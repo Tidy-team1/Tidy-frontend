@@ -2,7 +2,7 @@
   position: fixed;
   top: 60px;
   right: -400px;
-  width: 300px;
+  width: 350px;
   height: 85%;
   background: rgba(255, 255, 255, 0.54);
   border-left: 2px solid #d3b4c0;
@@ -17,7 +17,7 @@
   position: fixed;
   top: 60px;
   right: 20px;
-  width: 300px;
+  width: 330px;
   height: 85%;
   background: rgba(255, 255, 255, 0.54);
   border-left: 2px solid #d3b4c0;
@@ -68,7 +68,7 @@
 .chatContent {
   padding: 8px 12px;
   background: #e7c7d6;
-  border-radius: 10px;
+  border-radius: 15px;
   max-width: 70%;
   font-size: 14px;
   line-height: 1.4;
@@ -78,13 +78,13 @@
 .chat-msg.me .chatContent {
   background: #ae778f; /* 내 메시지는 진한 색 */
   color: white;
-  border-bottom-right-radius: 4px; /* 오른쪽 아래 모서리만 덜 둥글게 */
+  border-bottom-right-radius: 2px; /* 오른쪽 아래 모서리만 덜 둥글게 */
 }
 /* 팀원 메시지 스타일 */
 .chat-msg.team .chatContent {
   background: #f2dce6; /* 팀원 메시지는 연한 색 */
   color: #333;
-  border-bottom-left-radius: 4px; /* 왼쪽 아래 모서리만 덜 둥글게 */
+  border-bottom-left-radius: 2px; /* 왼쪽 아래 모서리만 덜 둥글게 */
 }
 /* 시스템 메시지 스타일 */
 .chat-msg.system .chatContent {

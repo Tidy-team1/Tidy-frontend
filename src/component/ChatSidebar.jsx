@@ -12,6 +12,21 @@ function ChatSidebar({
 }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const res = await axios.get(`/auth/me`);
+        console.log(res.data.id);
+        setUserId(res.data.id);
+      } catch (err) {
+        console.error('userId get 실패:', err);
+      }
+    };
+
+    fetchUserId();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -20,51 +35,55 @@ function ChatSidebar({
         const res = await axios.get(
           `/presentations/${presentationId}/comments`
         );
-        console.log('코멘트 응답:', res.status);
-        console.log(res.data);
+        console.log('코멘트 응답:', res.data);
+
+        const converted = res.data.map((c) => ({
+          id: c.id,
+          text: c.content,
+          sender: c.userId === userId ? 'me' : 'team',
+          slideId: c.slideId,
+          userName: c.userName,
+          createdAt: c.createdAt,
+          feedbackIds: c.feedbackIds,
+        }));
+        setMessages(converted);
       } catch (err) {
         console.error('코멘트 get 실패:', err);
       }
     };
+
     fetchComments();
-  }, [open]);
+  }, [open, userId, presentationId]);
 
-  useEffect(() => {
-    if (open && selectedFeedbackId !== null) {
-      // 실제 구현 시: selectedFeedbackId와 연결된 서버의 대화 내용을 불러와야 합니다.
-      setMessages([
-        {
-          text: `슬라이드 ${selectedSlide}의 피드백 (${selectedFeedbackId})`,
-          sender: 'system',
-        },
-        {
-          text: '이 부분 디자인 수정해야 할까요?',
-          sender: 'me',
-          feedbackId: selectedFeedbackId,
-        },
-        {
-          text: '네, 텍스트 크기를 좀 더 키워봅시다. 폰트는 이걸로 유지할까요?',
-          sender: 'team',
-          feedbackId: selectedFeedbackId,
-        },
-      ]);
-    } else {
-      setMessages([]); // 사이드바가 닫히거나 피드백이 선택되지 않으면 메시지 초기화
-    }
-  }, [open, selectedFeedbackId, selectedSlide]); // 의존성 배열에 추가
-
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
-    setMessages([
-      ...messages,
-      {
-        text: input,
+    const payload = {
+      content: input,
+      feedbackIds: selectedFeedbackId ? [selectedFeedbackId] : [],
+    };
+
+    try {
+      const res = await axios.post(
+        `/slides/${selectedSlide}/comments`,
+        payload
+      );
+      console.log(`코멘트post 응답:`, res.data);
+
+      const newComment = {
+        id: res.data.id,
+        text: res.data.content,
         sender: 'me',
-        slideIndex: selectedSlide,
-        feedbackId: selectedFeedbackId,
-      },
-    ]);
-    setInput('');
+        slideId: res.data.slideId,
+        userName: res.data.userName,
+        createdAt: res.data.createdAt,
+        feedbackIds: res.data.feedbackIds,
+      };
+
+      setMessages((prev) => [...prev, newComment]);
+      setInput('');
+    } catch (err) {
+      console.error('코멘트 post 실패:', err);
+    }
   };
 
   return (
@@ -83,7 +102,17 @@ function ChatSidebar({
 
       <div className="chat-body">
         {messages.map((msg, i) => (
-          <div key={i} className={`chat-msg ${msg.sender}`}>
+          <div
+            key={i}
+            className={`chat-msg ${msg.sender}`}
+            style={{ cursor: msg.slideId ? 'pointer' : 'default' }}
+            onClick={() => {
+              if (msg.slideId) {
+                console.log(`코멘트 슬라이드:`, msg.slideId);
+                //selectedSlide(msg.slideId); //해당 슬라이드로 이동되는지 확인 필요
+              }
+            }}
+          >
             <div className="chatContent">{msg.text}</div>
           </div>
         ))}
