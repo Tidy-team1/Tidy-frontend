@@ -516,6 +516,8 @@ function ReviewPage() {
     }
   };
 
+  const currentSlide = selectedSlideChat?.[selectedSlide] ?? null;
+
   return (
     <div className="reviewPageContainer">
       {loading && (
@@ -673,21 +675,23 @@ function ReviewPage() {
           </div>
         </div>
       </div>
-      <ChatSidebar
-        open={chatOpen}
-        onClose={handleChatClose}
-        selectedSlide={selectedSlide}
-        selectedSlideId={selectedSlideChat[selectedSlide]?.id}
-        selectedFeedbackId={selectedFeedbackId}
-        presentationId={presentationId}
-        onSelectCommentSlide={(slideIndex) => setSelectedSlide(slideIndex)}
-        onSelectCommentFeedback={(fid) => {
-          setSelectedFeedbackId(fid);
-          setClickedBboxId(fid); // 클릭 효과
-          setHoveredBboxId(fid); // 호버 효과
-        }}
-        slideList={selectedSlideChat} //slideId -> slideIndex 매핑용
-      />
+      {currentSlide ? (
+        <ChatSidebar
+          open={chatOpen}
+          onClose={handleChatClose}
+          selectedSlide={selectedSlide}
+          selectedSlideId={currentSlide.id}
+          selectedFeedbackId={selectedFeedbackId}
+          presentationId={presentationId}
+          onSelectCommentSlide={(slideIndex) => setSelectedSlide(slideIndex)}
+          onSelectCommentFeedback={(fid) => {
+            setSelectedFeedbackId(fid);
+            setClickedBboxId(fid); // 클릭 효과
+            setHoveredBboxId(fid); // 호버 효과
+          }}
+          slideList={selectedSlideChat} //slideId -> slideIndex 매핑용
+        />
+      ) : null}
     </div>
   );
 }
