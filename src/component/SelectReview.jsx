@@ -26,7 +26,7 @@ const reviewItems = [
     label: 'AI 피드백 제공',
     type: 'parent',
     children: [
-      { id: 'readability', label: '가독성', type: 'child' },
+      { id: 'text_summarization', label: '가독성', type: 'child' },
       { id: 'color_contrast', label: '색상 대비', type: 'child' },
       { id: 'design_feedback', label: '디자인 피드백', type: 'child' },
     ],
