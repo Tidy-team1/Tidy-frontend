@@ -195,9 +195,13 @@
   object-fit: contain; /* 박스 안에 비율 유지하며 맞춤 */
   position: relative;
 }
+.bbox-overlay-container {
+  z-index: 50;
+  cursor: pointer;
+}
 .bbox-overlay {
   position: absolute;
-  border: 3px solid red;
+  border: 2px solid red;
   pointer-events: none; /* 클릭 막아서 체크박스랑 UI 충돌 안 나게*/
   box-sizing: border-box;
 }

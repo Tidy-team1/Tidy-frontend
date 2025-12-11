@@ -8,6 +8,49 @@ import { useLocation } from 'react-router';
 import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8080';
 
+const BboxOverlay = ({
+  b,
+  onHover,
+  onLeave,
+  onClick,
+  isHovered,
+  isClicked,
+}) => (
+  <div
+    key={b.id}
+    className="bbox-overlay-container"
+    style={{
+      position: 'absolute',
+      left: b.left,
+      top: b.top,
+      width: b.width,
+      height: b.height,
+      // 피드백 체크박스에 마우스 올리면 활성화되도록 pointerEvents 제거
+    }}
+    onMouseEnter={() => onHover(b.id)}
+    onMouseLeave={onLeave}
+    onClick={() => onClick(b.id, b.slideIndex)}
+  >
+    <div
+      className={`bbox-overlay ${isClicked ? 'clicked' : ''}`}
+      style={{
+        width: '100%',
+        height: '100%',
+        border: isClicked ? '3px solid #d18aa3' : '3px solid red', // 클릭 시 색상 변경
+        backgroundColor: isClicked
+          ? 'rgba(174, 119, 143, 0.24)'
+          : 'transparent', // 클릭 시 반투명 배경
+        transition: 'background-color 0.2s, border 0.2s',
+      }}
+    />
+    {isHovered && (
+      <div className="chat-icon-container">
+        <div className="chat-icon">💬</div>
+      </div>
+    )}
+  </div>
+);
+
 function ReviewPage() {
   const location = useLocation();
   const { presentationId, taskId: initialTaskId } = location.state;
@@ -41,6 +84,10 @@ function ReviewPage() {
   const [isModified, setIsModified] = useState(false);
 
   const [undoStack, setUndoStack] = useState([]); //반영된 피드백 저장 (수정 전 클릭때 필요)
+
+  const [hoveredBboxId, setHoveredBboxId] = useState(null);
+  const [clickedBboxId, setClickedBboxId] = useState(null);
+  const [selectedFeedbackId, setSelectedFeedbackId] = useState(null); // 채팅창에 연결할 피드백 ID
 
   useEffect(() => {
     let intervalId;
@@ -401,6 +448,42 @@ function ReviewPage() {
     };
   }
 
+  const handleBboxClick = (feedbackId, slideIndex) => {
+    setSelectedSlide(slideIndex);
+    setSelectedFeedbackId(feedbackId);
+    setClickedBboxId(feedbackId);
+    setChatOpen(true);
+  };
+
+  const handleChatClose = () => {
+    setChatOpen(false);
+    setSelectedFeedbackId(null);
+    setClickedBboxId(null); // 채팅 닫을 때 클릭 상태 해제
+  };
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`/presentations/${presentationId}/download`, {
+        method: 'GET',
+      });
+
+      // 모든 헤더 출력
+      console.log('🔍 전체 응답 헤더:', [...res.headers.entries()]);
+
+      // 개별 헤더 확인
+      console.log('Content-Type:', res.headers.get('Content-Type'));
+      console.log(
+        'Content-Disposition:',
+        res.headers.get('Content-Disposition')
+      );
+      console.log('Content-Length:', res.headers.get('Content-Length'));
+
+      // 파일을 실제로 다운로드하지 않기 위해 blob은 만들지 않음
+    } catch (err) {
+      console.error('헤더 확인 중 오류 발생:', err);
+    }
+  };
+
   return (
     <div className="reviewPageContainer">
       {loading && (
@@ -419,7 +502,7 @@ function ReviewPage() {
       />
       <div>{isTeam && <ChatIcon onClick={() => setChatOpen(true)} />}</div>
 
-      <button className="saveButton" onClick={() => handleSlideButtonClick(2)}>
+      <button className="saveButton" onClick={handleSave}>
         ↓ 저장하기
       </button>
       <div className="reviewContainer">
@@ -520,18 +603,15 @@ function ReviewPage() {
           {activeBboxes
             .filter((b) => b.slideIndex === selectedSlide)
             .map((b) => (
-              <div
+              <BboxOverlay
                 key={b.id}
+                b={b}
                 className="bbox-overlay"
-                style={{
-                  position: 'absolute',
-                  border: '3px solid red',
-                  left: b.left,
-                  top: b.top,
-                  width: b.width,
-                  height: b.height,
-                  pointerEvents: 'none',
-                }}
+                onHover={setHoveredBboxId}
+                onLeave={() => setHoveredBboxId(null)}
+                onClick={handleBboxClick}
+                isHovered={hoveredBboxId === b.id}
+                isClicked={clickedBboxId === b.id}
               />
             ))}
         </div>
@@ -557,7 +637,13 @@ function ReviewPage() {
           </div>
         </div>
       </div>
-      <ChatSidebar open={chatOpen} onClose={() => setChatOpen(false)} />
+      <ChatSidebar
+        open={chatOpen}
+        onClose={handleChatClose}
+        selectedSlide={selectedSlide}
+        selectedFeedbackId={selectedFeedbackId}
+        presentationId={presentationId}
+      />
     </div>
   );
 }
