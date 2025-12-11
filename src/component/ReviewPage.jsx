@@ -463,26 +463,56 @@ function ReviewPage() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/presentations/${presentationId}/download`, {
-        method: 'GET',
+      const backend = "http://localhost:8080";
+      const url = `${backend}/presentations/${presentationId}/download`;
+
+      const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
       });
 
-      // 모든 헤더 출력
-      console.log('🔍 전체 응답 헤더:', [...res.headers.entries()]);
+      const blob = await res.blob();
 
-      // 개별 헤더 확인
-      console.log('Content-Type:', res.headers.get('Content-Type'));
-      console.log(
-        'Content-Disposition:',
-        res.headers.get('Content-Disposition')
-      );
-      console.log('Content-Length:', res.headers.get('Content-Length'));
+      // Content-Disposition에서 파일명 추출
+      const disposition = res.headers.get("Content-Disposition");
+      let filename = null;
 
-      // 파일을 실제로 다운로드하지 않기 위해 blob은 만들지 않음
+      if (disposition) {
+        // filename* 우선
+        const utf8Match = disposition.match(/filename\*\=UTF-8''([^;]+)/);
+        if (utf8Match && utf8Match[1]) {
+          filename = decodeURIComponent(utf8Match[1]);
+        } else {
+          // filename fallback
+          const fallbackMatch = disposition.match(/filename=\"?([^"]+)\"?/);
+          if (fallbackMatch && fallbackMatch[1]) {
+            filename = fallbackMatch[1];
+          }
+        }
+      }
+
+if (!filename) filename = "presentation.pptx";
+
+
+      // 🔥 filename이 여전히 null이면 fallback
+      if (!filename) filename = "presentation.pptx";
+
+      // blob URL 생성
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = filename; // ← 파일명이 정확히 적용됨
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (err) {
-      console.error('헤더 확인 중 오류 발생:', err);
+      console.error("다운로드 실패:", err);
     }
   };
+
 
   return (
     <div className="reviewPageContainer">
