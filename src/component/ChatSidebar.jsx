@@ -136,7 +136,12 @@ function ChatSidebar({
           placeholder="코멘트 입력…"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
         />
         <button className="send-btn" onClick={handleSend}>
           ➤
