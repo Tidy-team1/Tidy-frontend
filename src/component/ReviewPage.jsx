@@ -228,7 +228,7 @@ function ReviewPage() {
     };
 
     fetchScores();
-  }, [presentationId]);
+  }, [presentationId, feedbacks]);
 
   const currentScore = slideScores.find((s) => s.slideIndex === selectedSlide);
 
@@ -424,6 +424,9 @@ function ReviewPage() {
     }
   };
 
+  const designFeedbacks = feedbacks.filter((f) => f.type === 'design_feedback');
+  const otherFeedbacks = feedbacks.filter((f) => f.type !== 'design_feedback');
+
   useEffect(() => {
     setIsModified(undoStack.length > 0);
   }, [undoStack]);
@@ -453,6 +456,11 @@ function ReviewPage() {
   }
 
   const handleBboxClick = (feedbackId, slideIndex) => {
+    if (clickedBboxId === feedbackId) {
+      setSelectedFeedbackId(null);
+      setClickedBboxId(null);
+      return;
+    }
     setSelectedSlide(slideIndex);
     setSelectedFeedbackId(feedbackId);
     setClickedBboxId(feedbackId);
@@ -517,6 +525,60 @@ function ReviewPage() {
   };
 
   const currentSlide = selectedSlideChat?.[selectedSlide] ?? null;
+
+  //////////////////3함수 코멘트 피드백 선택안됨 문제 해결//////////////////////////////////////////
+  // helpers (ReviewPage 내부)
+  const findFeedbackData = (fid) => {
+    // groupedFeedbacks는 slideIndex 기준으로 묶여있음
+    for (const idx in groupedFeedbacks) {
+      const fb = groupedFeedbacks[idx].find(
+        (f) => String(f.id) === String(fid)
+      );
+      if (fb) return fb;
+    }
+    return null;
+  };
+
+  const ensureActiveBboxForFeedback = (fb) => {
+    if (!fb) return;
+    if (activeBboxes.some((b) => String(b.id) === String(fb.id))) return;
+
+    // convertBBoxToRendered는 이미 존재한다고 가정
+    const converted = convertBBoxToRendered(fb, fb.slideIndex);
+    setActiveBboxes((prev) => [
+      ...prev,
+      {
+        id: fb.id,
+        slideIndex: fb.slideIndex,
+        left: converted.left,
+        top: converted.top,
+        width: converted.width,
+        height: converted.height,
+      },
+    ]);
+  };
+
+  // 통합된 콜백
+  const handleSelectCommentFeedbackFromSidebar = (fid) => {
+    console.log('Sidebar clicked fid:', fid);
+    const fb = findFeedbackData(fid);
+
+    if (fb) {
+      // fb.slideIndex는 activeBboxes에서 사용하는 기준(인덱스)이어야 함
+      setSelectedSlide(fb.slideIndex); // 반드시 slideIndex로 셋
+      ensureActiveBboxForFeedback(fb); // activeBboxes에 없으면 추가
+      setSelectedFeedbackId(fid);
+      setClickedBboxId(fid);
+      setHoveredBboxId(fid);
+      setChatOpen(true);
+    } else {
+      // 안전망: groupedFeedbacks에 없다면 activeBboxes에서 찾아보거나 로그
+      console.warn('feedback not found in groupedFeedbacks for fid:', fid);
+      setSelectedFeedbackId(fid);
+      setClickedBboxId(fid);
+      setHoveredBboxId(fid);
+    }
+  };
 
   return (
     <div className="reviewPageContainer">
@@ -634,24 +696,31 @@ function ReviewPage() {
             }}
           />
           {/* activeBboxes 를 이용해 Overlay 렌더 */}
+          {console.log('selectedSlide:', selectedSlide)}
+
           {activeBboxes
             .filter((b) => b.slideIndex === selectedSlide)
-            .map((b) => (
-              <BboxOverlay
-                key={b.id}
-                b={b}
-                className="bbox-overlay"
-                onHover={setHoveredBboxId}
-                onLeave={() => setHoveredBboxId(null)}
-                onClick={handleBboxClick}
-                isHovered={
-                  hoveredBboxId === b.id || selectedFeedbackId === b.id
-                }
-                isClicked={
-                  clickedBboxId === b.id || selectedFeedbackId === b.id
-                }
-              />
-            ))}
+            .map((b) => {
+              console.log(b);
+              return (
+                <BboxOverlay
+                  key={b.id}
+                  b={b}
+                  className="bbox-overlay"
+                  onHover={setHoveredBboxId}
+                  onLeave={() => setHoveredBboxId(null)}
+                  onClick={handleBboxClick}
+                  isHovered={
+                    String(hoveredBboxId) === String(b.id) ||
+                    String(selectedFeedbackId) === String(b.id)
+                  }
+                  isClicked={
+                    String(clickedBboxId) === String(b.id) ||
+                    String(selectedFeedbackId) === String(b.id)
+                  }
+                />
+              );
+            })}
         </div>
 
         <div className="reviewPageBottom">
@@ -684,11 +753,7 @@ function ReviewPage() {
           selectedFeedbackId={selectedFeedbackId}
           presentationId={presentationId}
           onSelectCommentSlide={(slideIndex) => setSelectedSlide(slideIndex)}
-          onSelectCommentFeedback={(fid) => {
-            setSelectedFeedbackId(fid);
-            setClickedBboxId(fid); // 클릭 효과
-            setHoveredBboxId(fid); // 호버 효과
-          }}
+          onSelectCommentFeedback={handleSelectCommentFeedbackFromSidebar}
           slideList={selectedSlideChat} //slideId -> slideIndex 매핑용
         />
       ) : null}

@@ -18,17 +18,17 @@ const reviewItems = [
       { id: 'font_consistency', label: '폰트 일관성', type: 'child' },
     ],
   },
-  { id: 'shape_image_alignment', label: '도형, 이미지', type: 'parent' },
-  { id: 'layout_alignment', label: '정렬, 대칭 등', type: 'parent' },
-  { id: 'theme', label: '테마', type: 'parent' },
+
+  { id: 'shape_image_alignment', label: '도형, 이미지 정렬', type: 'parent' },
+
   {
     id: 'aiFeedback',
     label: 'AI 피드백 제공',
     type: 'parent',
     children: [
       { id: 'text_summarization', label: '가독성', type: 'child' },
-      { id: 'color_contrast', label: '색상 대비', type: 'child' },
-      { id: 'design_feedback', label: '디자인 피드백', type: 'child' },
+      { id: 'color_contrast', label: '색상 대비', type: 'child' }, ///image_contrast id 추가해서 같이 post
+      { id: 'design_feedback', label: '디자인 피드백', type: 'child' }, //이거만 ReviewPage에서 밑에 띄우기
     ],
   },
 ];
@@ -159,6 +159,9 @@ function SelectReview() {
 
   const sendReviewRequest = async () => {
     const selectedOptions = leafOptionsKeys.filter((key) => checkedItems[key]);
+    if (selectedOptions.includes('color_contrast')) {
+      selectedOptions.push('image_contrast');
+    }
     const body = {
       options: selectedOptions,
     };
@@ -190,14 +193,16 @@ function SelectReview() {
             {renderItem(reviewItems[1])}
           </div>
 
-          {/* 3. 단일 항목들 (2열 레이아웃) */}
+          {/* 3. 단일 항목들 (2열 레이아웃) ->1개로 수정됨 */}
           <div className="single-items-group">
-            {reviewItems.slice(2, 5).map(renderItem)}
+            {reviewItems
+              .filter((item) => item.id === 'shape_image_alignment')
+              .map(renderItem)}
           </div>
 
           {/* 4. AI 피드백 그룹 (2열 레이아웃) */}
           <div className="group-wrapper ai-group">
-            {renderItem(reviewItems[5])}
+            {renderItem(reviewItems[3])}
           </div>
         </div>
       </div>
